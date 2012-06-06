@@ -48,11 +48,18 @@
     </script>
   </head>
 
-  <body>
-    <div id='map' style='width:400px; height:400px;'></div>
+  <body >
+  <div style="margin-left:2px; width:794px; height:239px; background-image:url('{{STATIC_URL}}hills.jpg');" >
+  	<div style="position: relative; top: 190px;left: 190px;">
+  	<div style="float: left;"><img src="{{STATIC_URL}}mq_logo.png"></div><div style="float: left;font-family: sans-serif;font-weight: bold;font-size: 22px;top: 14px;left: 12px;position: relative;">HillWalker</div>
+  	</div>
+   </div>
+   <div style="margin-left:0px; width:794px; height:810px; background-image:url('{{STATIC_URL}}grass.jpg'); padding-top: 20px;" >
+    <div id='map' style='background-color:rgba(0, 0, 0, 0.6); display: block; padding: 8px; margin-left: 200px; width:400px; height:400px;'></div>
     <div id='output-ul' style='font-family:"courier"' >Output:<br/></div>
     <div id='output-lr' style='font-family:"courier"' >Output:<br/></div>
     <a id="image-link" href="">Image</a>
+	</div>  
   </body>
 </html>
 

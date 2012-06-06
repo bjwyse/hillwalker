@@ -9,12 +9,13 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from django.template import RequestContext
 
 GRID_DIVISIONS = 20
 API_KEY = "Fmjtd%7Cluu7n1u2nq%2C2l%3Do5-5rbad"
 
 def home(request):
-    return render_to_response('map/home.html')
+    return render_to_response( 'map/home.html', context_instance=RequestContext(request))
 
 def contour_image(request):
     ul = request.GET.get('ul')
@@ -29,7 +30,7 @@ def contour_image(request):
     print ("lat from %s to %s" % (upper_lat, lower_lat))
     print ("lng from %s to %s" % (left_lng, right_lng))
     
-    grid(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng))
+    grid2(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng))
     
     image_data = open("test_cropped.png", "rb").read()
     return HttpResponse(image_data, mimetype="image/png")
@@ -109,19 +110,86 @@ def grid (upper_lat, lower_lat, left_lng, right_lng):
            fmt='%1.0f',
            fontsize=8)
            
-    #plt.subplots_adjust(left=0.0, right=0.1, top=1.0, bottom=0.0)
     plt.savefig('test.png', bbox_inches='tight', transparent='True')
     
     im = Image.open('test.png')
-#    size = 128,128
-#    im.thumbnail(size, Image.ANTIALIAS)
-#    im.save("test.thumbnail.jpg", "JPEG")
-    
+
     box = (62, 10, 684, 490)
     region = im.crop(box)
     region.save("test_cropped.png", "PNG")
 
+# make separate calls to API for each row
+def grid2 (upper_lat, lower_lat, left_lng, right_lng):
+    print "generating grid with divsions %f " % GRID_DIVISIONS
+    print ("lat from %.6f to %.6f" % (upper_lat, lower_lat))
+    print ("lng from %.6f to %.6f" % (left_lng, right_lng))
+    
+    lat_diff = upper_lat - lower_lat
+    lat_spacing = lat_diff / GRID_DIVISIONS
+    
+    lng_diff = left_lng - right_lng
+    lng_spacing = lng_diff / GRID_DIVISIONS
+    
+    lats = []
+    lngs = []
+    for i in range(GRID_DIVISIONS):
+        lats.append(upper_lat - (i * lat_spacing))
+        lngs.append(right_lng - (i * lng_spacing))
+    
+    #print lats
+    #print lngs
+    
+    hts = []
+    
+    # for each lat, call the API for the whole row
+    for lat in lats:
+        list_coords=[]
+        for lng in lngs:
+            list_coords.append(lat)
+            list_coords.append(lng)
 
+        print list_coords
+        print "--------"
+        data = compress(list_coords, 5)
+        url = "http://platform.beta.mapquest.com/elevation/v1/getElevationProfile?key=Fmjtd%7Cluu7n1u2nq%2C2l%3Do5-5rbad&shapeFormat=cmp&latLngCollection="
+        #print data
+        full_url = url + data
+        #print full_url
+
+        response = urllib2.urlopen(full_url)
+        print "*************"
+        resp_string = response.read()
+        print resp_string
+        results = json.loads(resp_string)
+        #pp = pprint.PrettyPrinter(indent=4)
+        #pp.pprint(results['elevationProfile'])
+
+        index = 0
+        row = []
+        for lng in lngs:
+            row.append(results['elevationProfile'][index]['height'])
+            index = index + 1
+        hts.append(row)
+                
+    #for result in results['elevationProfile']:
+    #    hts.append(result['height'])
+
+    print hts
+    
+    plt.figure(facecolor='0000')
+    plt.axes().set_axis_off()
+
+    CS = plt.contour(lats, lngs, np.array(hts), 6, colors='000',)
+
+    plt.clabel(CS, inline=1, fmt='%1.0f', fontsize=8)
+           
+    plt.savefig('test.png', bbox_inches='tight', transparent='True')
+    
+    im = Image.open('test.png')
+
+    box = (62, 10, 684, 490)
+    region = im.crop(box)
+    region.save("test_cropped.png", "PNG")
     
 def compress(points, precision):
    oldLat = 0
