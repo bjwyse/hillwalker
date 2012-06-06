@@ -25,10 +25,12 @@
 
         /*Construct an instance of MQA.TileMap with the options object*/
         window.map = new MQA.TileMap(options);
-		
+        
+		        
 		MQA.EventManager.addListener(window.map, 'moveend', eventMoveEnd);
  		eventMoveEnd(null);
-			
+ 		
+ 		var imageOverlay;
 	
   		function eventMoveEnd(evt){
 			var currentUpperLeftLat = window.map.getBounds().ul.getLatitude();
@@ -38,6 +40,22 @@
 			var currentLowerRightLng = window.map.getBounds().lr.getLongitude();
 			$('#output-lr').html('top-left: (' + currentLowerRightLat + ',' + currentLowerRightLng + ')</br>');
 			$("#image-link").attr("href", "/contour_image/?ul=" + currentUpperLeftLat + ',' + currentUpperLeftLng + '&lr=' + currentLowerRightLat + ',' + currentLowerRightLng)
+			
+    /*Set the URL of the image*/
+    		MQA.withModule('shapes', function() {
+    			if (imageOverlay) {
+    				map.removeShape(imageOverlay);
+    			}
+   				imageOverlay = new MQA.ImageOverlay(); 
+    			imageOverlay.imageURL="/contour_image/?ul=" + currentUpperLeftLat + ',' + currentUpperLeftLng + '&lr=' + currentLowerRightLat + ',' + currentLowerRightLng;
+
+			    /*Sets the shape points. They must be in the following order [upper left latitude, upper left longitude, 
+    			lower right latitude, lower right longitude] to define the upper left and lower right corners of the rectangle.*/ 
+	    		imageOverlay.shapePoints=[currentUpperLeftLat, currentUpperLeftLng, currentLowerRightLat, currentLowerRightLng];
+	    		map.addShape(imageOverlay);
+	    	});
+
+    /*Add to the map's default shape collection*/ 
   		}
 
 		
