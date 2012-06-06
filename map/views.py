@@ -1,5 +1,6 @@
 # Create your views here.
 from django.shortcuts import render_to_response
+from django.http import HttpResponse
 import urllib2
 import urllib
 import json
@@ -29,7 +30,10 @@ def contour_image(request):
     
     grid(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng))
     
-    return render_to_response('map/contour_image.html')
+    image_data = open("test.png", "rb").read()
+    return HttpResponse(image_data, mimetype="image/png")
+
+    #return render_to_response('map/contour_image.html')
 
 def grid (upper_lat, lower_lat, left_lng, right_lng):
     print "generating grid with divsions %f " % GRID_DIVISIONS
@@ -95,13 +99,14 @@ def grid (upper_lat, lower_lat, left_lng, right_lng):
     print hts
     
     plt.figure(facecolor='0000')
+    plt.axes().set_axis_off()
 
     CS = plt.contour(lats, lngs, np.array(hts), 6, colors='w',)
 
 
-    plt.axes().set_axis_off()
-
-    plt.savefig('test.png', bbox_inches='tight', transparent='True')
+    
+    #plt.subplots_adjust(left=0.0, right=0.1, top=1.0, bottom=0.0)
+    plt.savefig('test.png', bbox_inches='tight', facecolor='000')#, transparent='True')
 
     
 def compress(points, precision):
