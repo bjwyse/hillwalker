@@ -8,6 +8,7 @@ import pprint
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 GRID_DIVISIONS = 20
 API_KEY = "Fmjtd%7Cluu7n1u2nq%2C2l%3Do5-5rbad"
@@ -30,7 +31,7 @@ def contour_image(request):
     
     grid(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng))
     
-    image_data = open("test.png", "rb").read()
+    image_data = open("test_cropped.png", "rb").read()
     return HttpResponse(image_data, mimetype="image/png")
 
     #return render_to_response('map/contour_image.html')
@@ -101,12 +102,25 @@ def grid (upper_lat, lower_lat, left_lng, right_lng):
     plt.figure(facecolor='0000')
     plt.axes().set_axis_off()
 
-    CS = plt.contour(lats, lngs, np.array(hts), 6, colors='w',)
+    CS = plt.contour(lats, lngs, np.array(hts), 6, colors='000',)
 
-
-    
+    plt.clabel(CS,  # label every second level
+           inline=1,
+           fmt='%1.0f',
+           fontsize=8)
+           
     #plt.subplots_adjust(left=0.0, right=0.1, top=1.0, bottom=0.0)
-    plt.savefig('test.png', bbox_inches='tight', facecolor='000')#, transparent='True')
+    plt.savefig('test.png', bbox_inches='tight', transparent='True')
+    
+    im = Image.open('test.png')
+#    size = 128,128
+#    im.thumbnail(size, Image.ANTIALIAS)
+#    im.save("test.thumbnail.jpg", "JPEG")
+    
+    box = (62, 10, 684, 490)
+    region = im.crop(box)
+    region.save("test_cropped.png", "PNG")
+
 
     
 def compress(points, precision):
