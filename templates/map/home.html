@@ -20,7 +20,7 @@
           latLng:{lat:53.010278, lng:-6.3275},   /*center of map in latitude/longitude*/
           mtype:'map',                               /*map type (map)*/
           bestFitMargin:0,                           /*margin offset from the map viewport when applying a bestfit on shapes*/
-          zoomOnDoubleClick:true                     /*zoom in when double-clicking on map*/
+          zoomOnDoubleClick:false                     /*zoom in when double-clicking on map*/
         };
 
         /*Construct an instance of MQA.TileMap with the options object*/
@@ -45,7 +45,7 @@
 			$('#output-ul').html('top-left: (' + currentUpperLeftLat + ',' + currentUpperLeftLng + ')</br>');
 			var currentLowerRightLat = window.map.getBounds().lr.getLatitude();
 			var currentLowerRightLng = window.map.getBounds().lr.getLongitude();
-			$('#output-lr').html('top-left: (' + currentLowerRightLat + ',' + currentLowerRightLng + ')</br>');
+			$('#output-lr').html('lower-right: (' + currentLowerRightLat + ',' + currentLowerRightLng + ')</br>');
 			$("#image-link").attr("href", "/contour_image/?ul=" + currentUpperLeftLat + ',' + currentUpperLeftLng + '&lr=' + currentLowerRightLat + ',' + currentLowerRightLng)
 			
     /*Set the URL of the image*/
@@ -80,10 +80,10 @@
   	</div>
    </div>
    <div style="margin-left:0px; width:794px; height:810px; background-image:url('{{STATIC_URL}}grass.jpg'); padding-top: 20px;" >
-    <div id='map' style='background-color:rgba(0, 0, 0, 0.6); display: block; padding: 8px; margin-left: 200px; width:400px; height:400px;'></div>
-    <div id='output-ul' style='font-family:"courier"' >Output:<br/></div>
-    <div id='output-lr' style='font-family:"courier"' >Output:<br/></div>
-    <a id="image-link" href="">Image</a>
+    <div id='map' style='background-color:rgba(0, 0, 0, 0.6); display: block; padding: 8px; margin-left: 200px; margin-bottom: 100px; width:400px; height:400px;'></div>
+    <div id='output-ul' style='opacity: 0.2; font-family:"courier"' >Output:<br/></div>
+    <div id='output-lr' style='opacity: 0.2; font-family:"courier"' >Output:<br/></div>
+    <a style = "opacity: 0.2" id="image-link" href="">link to contour image</a>
 	</div>  
   </body>
 </html>

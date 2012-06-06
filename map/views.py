@@ -109,7 +109,7 @@ def grid (upper_lat, lower_lat, left_lng, right_lng, mtype):
     if (mtype != 'map'):
         CS = plt.contour(lats, lngs, np.array(hts), 10, colors='#999999',)
     else:
-        CS = plt.contour(lats, lngs, np.array(hts), 10, colors='#000000',)
+        CS = plt.contour(lats, lngs, np.array(hts), 10, colors='#333333',)
 
     plt.clabel(CS,  # label every second level
            inline=1,
