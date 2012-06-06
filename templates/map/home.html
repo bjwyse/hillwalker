@@ -25,9 +25,16 @@
 
         /*Construct an instance of MQA.TileMap with the options object*/
         window.map = new MQA.TileMap(options);
-        
-		        
+       
+		   
+		MQA.withModule('viewoptions', function() {
+		    window.map.addControl(
+      			new MQA.ViewOptions()
+		    );
+ 		 });
+       
 		MQA.EventManager.addListener(window.map, 'moveend', eventMoveEnd);
+		MQA.EventManager.addListener(map, 'maptypechanged', eventMoveEnd);
  		eventMoveEnd(null);
  		
  		var imageOverlay;
@@ -47,7 +54,7 @@
     				map.removeShape(imageOverlay);
     			}
    				imageOverlay = new MQA.ImageOverlay(); 
-    			imageOverlay.imageURL="/contour_image/?ul=" + currentUpperLeftLat + ',' + currentUpperLeftLng + '&lr=' + currentLowerRightLat + ',' + currentLowerRightLng;
+    			imageOverlay.imageURL="/contour_image/?ul=" + currentUpperLeftLat + ',' + currentUpperLeftLng + '&lr=' + currentLowerRightLat + ',' + currentLowerRightLng + '&mtype=' + window.map.getMapType();
 
 			    /*Sets the shape points. They must be in the following order [upper left latitude, upper left longitude, 
     			lower right latitude, lower right longitude] to define the upper left and lower right corners of the rectangle.*/ 

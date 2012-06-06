@@ -18,9 +18,12 @@ def home(request):
     return render_to_response( 'map/home.html', context_instance=RequestContext(request))
 
 def contour_image(request):
+    
+    mtype = request.GET.get('mtype')
     ul = request.GET.get('ul')
     lr = request.GET.get('lr')
     print "Parameters"
+    print "Map type: ", mtype
     print "Upper Left: ", ul
     print "Lower Right: ", lr
     
@@ -30,14 +33,14 @@ def contour_image(request):
     print ("lat from %s to %s" % (upper_lat, lower_lat))
     print ("lng from %s to %s" % (left_lng, right_lng))
     
-    grid2(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng))
+    grid(float(upper_lat), float(lower_lat), float(left_lng), float(right_lng), mtype)
     
     image_data = open("test_cropped.png", "rb").read()
     return HttpResponse(image_data, mimetype="image/png")
 
     #return render_to_response('map/contour_image.html')
 
-def grid (upper_lat, lower_lat, left_lng, right_lng):
+def grid (upper_lat, lower_lat, left_lng, right_lng, mtype):
     print "generating grid with divsions %f " % GRID_DIVISIONS
     print ("lat from %.6f to %.6f" % (upper_lat, lower_lat))
     print ("lng from %.6f to %.6f" % (left_lng, right_lng))
@@ -81,7 +84,7 @@ def grid (upper_lat, lower_lat, left_lng, right_lng):
     response = urllib2.urlopen(full_url)
     print "*************"
     resp_string = response.read()
-    print resp_string
+    #print resp_string
     results = json.loads(resp_string)
     #pp = pprint.PrettyPrinter(indent=4)
     #pp.pprint(results['elevationProfile'])
@@ -95,15 +98,18 @@ def grid (upper_lat, lower_lat, left_lng, right_lng):
     for lat in lats:
         row = []
         for lng in lngs:
-            row.append(results['elevationProfile'][index]['height'])
+            row.insert(0,results['elevationProfile'][index]['height'])
             index = index + 1
-        hts.append(row)
-    print hts
+        hts.insert(0,row)
+    #print hts
     
     plt.figure(facecolor='0000')
     plt.axes().set_axis_off()
 
-    CS = plt.contour(lats, lngs, np.array(hts), 6, colors='000',)
+    if (mtype != 'map'):
+        CS = plt.contour(lats, lngs, np.array(hts), 10, colors='#999999',)
+    else:
+        CS = plt.contour(lats, lngs, np.array(hts), 10, colors='#000000',)
 
     plt.clabel(CS,  # label every second level
            inline=1,
@@ -167,9 +173,9 @@ def grid2 (upper_lat, lower_lat, left_lng, right_lng):
         index = 0
         row = []
         for lng in lngs:
-            row.append(results['elevationProfile'][index]['height'])
+            row.insert(0,results['elevationProfile'][index]['height'])
             index = index + 1
-        hts.append(row)
+        hts.insert(0,row)
                 
     #for result in results['elevationProfile']:
     #    hts.append(result['height'])
